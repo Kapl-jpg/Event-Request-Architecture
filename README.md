@@ -12,7 +12,7 @@ Data Request Mechanism: Retrieve and update shared data from anywhere in your pr
 ## 2. Installation
 The installation is done through the Unity module. Go to `Window > Package Manager > + > Install package from git URL...` and paste the link:
 ```
-git clone https://github.com/Kapl-jpg/EventDrivenArchitecture.git
+https://github.com/Kapl-jpg/EventDrivenArchitecture.git
 ```
 ## 3. Working with Events
 ### 3.1 Registering Methods as Event Handlers
