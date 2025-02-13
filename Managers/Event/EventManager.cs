@@ -1,12 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public static class EventManager
 {
-    private static readonly Dictionary<string, Action<object>> EventHandlers = new();
-    private static readonly Dictionary<string, Action> SimpleEventHandlers = new();
-    
+    private static readonly Dictionary<string, Delegate> EventHandlers = new();
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Initialize()
     {
@@ -16,65 +15,91 @@ public static class EventManager
     private static void OnApplicationQuit()
     {
         EventHandlers.Clear();
-        SimpleEventHandlers.Clear();
     }
 
-    public static void Publish(string eventName, object eventArgs = null)
-    {
-        if (EventHandlers.TryGetValue(eventName, out var handler))
-        {
-            handler?.Invoke(eventArgs);
-        }
-        
-        if (SimpleEventHandlers.TryGetValue(eventName, out var simpleHandler))
-        {
-            simpleHandler?.Invoke();
-        }
-    }
+    #region Subscribe with parameters
 
-    private static void SubscribeInternal(string eventName, Action<object> handler)
+    public static void Subscribe<T>(string eventName, Action<T> handler)
     {
-        if (!EventHandlers.TryAdd(eventName, handler))
+        if (EventHandlers.TryGetValue(eventName, out var existing))
         {
-            EventHandlers[eventName] += handler;
+            EventHandlers[eventName] = Delegate.Combine(existing, handler);
+        }
+        else
+        {
+            EventHandlers.Add(eventName, handler);
         }
     }
 
-    private static void SubscribeInternal(string eventName, Action handler)
+    public static void Unsubscribe<T>(string eventName, Action<T> handler)
     {
-        if (!SimpleEventHandlers.TryAdd(eventName, handler))
+        if (EventHandlers.TryGetValue(eventName, out var existing))
         {
-            SimpleEventHandlers[eventName] += handler;
+            var currentDel = Delegate.Remove(existing, handler);
+            if (currentDel == null)
+                EventHandlers.Remove(eventName);
+            else
+                EventHandlers[eventName] = currentDel;
         }
     }
 
-    private static void UnsubscribeInternal(string eventName, Action<object> handler)
+    public static void Publish<T>(string eventName, T eventArgs)
     {
-        if (!EventHandlers.ContainsKey(eventName)) return;
-
-        EventHandlers[eventName] -= handler;
-        if (EventHandlers[eventName] == null)
+        if (EventHandlers.TryGetValue(eventName, out var del))
         {
-            EventHandlers.Remove(eventName);
+            if (del is Action<T> callback)
+            {
+                callback.Invoke(eventArgs);
+            }
+            else
+            {
+                Debug.LogError($"Событие '{eventName}' существует, но тип делегата не соответствует Action<{typeof(T).Name}>");
+            }
         }
     }
 
-    private static void UnsubscribeInternal(string eventName, Action handler)
-    {
-        if (!SimpleEventHandlers.ContainsKey(eventName)) return;
+    #endregion
 
-        SimpleEventHandlers[eventName] -= handler;
-        if (SimpleEventHandlers[eventName] == null)
+    #region Subscribe without parameters
+
+    public static void Subscribe(string eventName, Action handler)
+    {
+        if (EventHandlers.TryGetValue(eventName, out var existing))
         {
-            SimpleEventHandlers.Remove(eventName);
+            EventHandlers[eventName] = Delegate.Combine(existing, handler);
+        }
+        else
+        {
+            EventHandlers.Add(eventName, handler);
         }
     }
-    
-    public static class Access
+
+    public static void Unsubscribe(string eventName, Action handler)
     {
-        public static void Subscribe(string eventName, Action<object> handler) => SubscribeInternal(eventName, handler);
-        public static void Subscribe(string eventName, Action handler) => SubscribeInternal(eventName, handler);
-        public static void Unsubscribe(string eventName, Action<object> handler) => UnsubscribeInternal(eventName, handler);
-        public static void Unsubscribe(string eventName, Action handler) => UnsubscribeInternal(eventName, handler);
+        if (EventHandlers.TryGetValue(eventName, out var existing))
+        {
+            var currentDel = Delegate.Remove(existing, handler);
+            if (currentDel == null)
+                EventHandlers.Remove(eventName);
+            else
+                EventHandlers[eventName] = currentDel;
+        }
     }
+
+    public static void Publish(string eventName)
+    {
+        if (EventHandlers.TryGetValue(eventName, out var del))
+        {
+            if (del is Action callback)
+            {
+                callback.Invoke();
+            }
+            else
+            {
+                Debug.LogError($"Событие '{eventName}' существует, но тип делегата не соответствует Action");
+            }
+        }
+    }
+
+    #endregion
 }

@@ -14,9 +14,8 @@ namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleTriggerEvent
         }
 
         [Event(true, "ApplyDamage")]
-        private void ApplyDamage(object data)
+        private void ApplyDamage(int damage)
         {
-            if (data is not int damage) return;
             _currentHealth = Mathf.Clamp(_currentHealth - damage, 0, maxHealth);
             
             print(_currentHealth);
