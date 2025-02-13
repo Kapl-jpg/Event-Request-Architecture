@@ -14,14 +14,14 @@ namespace EventRequest.Managers
             foreach (var method in methods)
             {
                 if (method.DeclaringType == null) continue;
-                
+
                 if (!method.DeclaringType.IsSubclassOf(typeof(Subscriber)))
                 {
                     Debug.LogException(new Exception(
-                        $"Класс {method.DeclaringType.Name} имеет [Event('{method.Name}')] атрибут, но не наследуется от Subscriber!"));
+                        $"The {method.DeclaringType.Name} class has the [Event('{method.Name}')] attribute, but it does not inherit from Subscriber!"));
                 }
             }
-        
+
             var fields = TypeCache.GetFieldsWithAttribute<RequestAttribute>();
 
             foreach (var field in fields)
@@ -31,7 +31,7 @@ namespace EventRequest.Managers
                     if (!field.DeclaringType.IsSubclassOf(typeof(Subscriber)))
                     {
                         Debug.LogException(new Exception(
-                            $"Класс {field.DeclaringType.Name} имеет [Request('{field.Name}')] атрибут, но не наследуется от Subscriber!"));
+                            $"The {field.DeclaringType.Name} class has the [Request('{field.Name}')] attribute, but it does not inherit from Subscriber!"));
                     }
                 }
             }
