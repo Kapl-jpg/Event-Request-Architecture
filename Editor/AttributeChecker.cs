@@ -9,6 +9,7 @@ namespace EventRequest.Managers
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void OnCompilationFinished()
         {
+#if UNITY_EDITOR
             var methods = TypeCache.GetMethodsWithAttribute<EventAttribute>();
 
             foreach (var method in methods)
@@ -27,14 +28,14 @@ namespace EventRequest.Managers
             foreach (var field in fields)
             {
                 if (field.DeclaringType == null) continue;
+
+                if (!field.DeclaringType.IsSubclassOf(typeof(Subscriber)))
                 {
-                    if (!field.DeclaringType.IsSubclassOf(typeof(Subscriber)))
-                    {
-                        Debug.LogException(new Exception(
-                            $"The {field.DeclaringType.Name} class has the [Request('{field.Name}')] attribute, but it does not inherit from Subscriber!"));
-                    }
+                    Debug.LogException(new Exception(
+                        $"The {field.DeclaringType.Name} class has the [Request('{field.Name}')] attribute, but it does not inherit from Subscriber!"));
                 }
             }
+#endif
         }
     }
 }

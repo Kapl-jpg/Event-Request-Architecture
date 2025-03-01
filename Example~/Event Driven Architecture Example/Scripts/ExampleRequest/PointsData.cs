@@ -13,5 +13,12 @@ namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleRequest
             points.Value = Random.Range(0, 1001);
             print($"New points value: {points.Value}");
         }
+
+        [Event("ChangePoints")]
+        private void ChangePoints(int value)
+        {
+            
+            print(value);
+        }
     }
 }

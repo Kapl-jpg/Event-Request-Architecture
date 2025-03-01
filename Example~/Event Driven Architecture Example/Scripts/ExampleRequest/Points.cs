@@ -12,7 +12,7 @@ namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleRequest
 
         public void ChangePoints()
         {
-            EventManager.Publish("ChangePoints");
+            EventManager.Publish("ChangePoints",50);
         }
     }
 }
