@@ -1,4 +1,4 @@
-# Kapl Event Driven Architecture Documentation
+# Kapl Event-Request Architecture Documentation
 ## 1. Introduction
 ### 1.1 Overview
 This framework implements an event-driven architecture for Unity, enabling you to trigger events from anywhere in your project. 
@@ -307,7 +307,7 @@ public class SOTest : MonoBehaviour
 }
 ```
 ## 9. Conclusion
-The Kapl Event Driven Framework provides a flexible system for component interaction using events and data requests. 
+The Kapl Event Request Framework provides a flexible system for component interaction using events and data requests. 
 With three distinct methods for event registration, you can tailor the scope of event invocation—be it global, grouped, or object-specific. 
 Additionally, events can be triggered with or without data, according to your needs. 
 This architecture improves modularity, scalability, and simplifies debugging in Unity projects.
