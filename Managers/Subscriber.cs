@@ -6,10 +6,12 @@ using UnityEngine;
 
 public abstract class Subscriber : MonoBehaviour
 {
+    private bool _tempIsRegistry;
     protected virtual void OnEnable()
     {
         SubscribeToEvents();
         SubscribeToRequests();
+        SubscribeToTemporaryRequests();
     }
 
     protected virtual void OnDisable()
@@ -37,18 +39,15 @@ public abstract class Subscriber : MonoBehaviour
 
                 if (parameters.Length == 0)
                 {
-                    // Подписка для методов без параметров.
                     var action = (Action)Delegate.CreateDelegate(typeof(Action), this, method);
                     EventManager.Subscribe(eventName, action);
                 }
                 else if (parameters.Length == 1)
                 {
-                    // Подписка для методов с одним параметром: извлекаем тип параметра.
                     Type paramType = parameters[0].ParameterType;
                     Type delegateType = typeof(Action<>).MakeGenericType(paramType);
                     var action = Delegate.CreateDelegate(delegateType, this, method);
 
-                    // Находим обобщённый метод Subscribe<T>(string, Action<T>)
                     MethodInfo subscribeMethod = typeof(EventManager)
                         .GetMethods(BindingFlags.Public | BindingFlags.Static)
                         .FirstOrDefault(m => m.Name == "Subscribe" &&
@@ -62,12 +61,12 @@ public abstract class Subscriber : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError($"Не найден метод Subscribe для типа {paramType}");
+                        Debug.LogError($"No Subscribe method found for type {paramType}");
                     }
                 }
                 else
                 {
-                    Debug.LogError("Методы с более чем одним параметром не поддерживаются для подписки на события.");
+                    Debug.LogError("Methods with more than one parameter are not supported for subscribing from events.");
                 }
             }
         }
@@ -109,18 +108,17 @@ public abstract class Subscriber : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError($"Не найден метод Unsubscribe для типа {paramType}");
+                        Debug.LogError($"No Unubscribe method found for type {paramType}");
                     }
                 }
                 else
                 {
-                    Debug.LogError("Методы с более чем одним параметром не поддерживаются для отписки от событий.");
+                    Debug.LogError("Methods with more than one parameter are not supported for unsubscribing from events");
                 }
             }
         }
     }
 
-    // Пример работы с RequestAttribute оставляем без изменений.
     private void SubscribeToRequests()
     {
         foreach (var field in GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
@@ -137,6 +135,29 @@ public abstract class Subscriber : MonoBehaviour
             observableField.OnValueChanged += value => { RequestManager.SetValue(requestName, value); };
             RequestManager.SetValue(requestName, observableField.GetValue());
         }
+    }
+
+    private void SubscribeToTemporaryRequests()
+    {
+        if (_tempIsRegistry)
+            return;
+        
+        foreach (var field in GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+        {
+            var attribute = field.GetCustomAttribute<TempRequestAttribute>();
+            if (attribute == null) continue;
+
+            string requestName = GetTempRequestName(attribute);
+            var fieldValue = field.GetValue(this);
+
+            if (fieldValue is not IObservableField observableField) continue;
+
+            // Замечание: лямбда здесь создаётся заново, что может помешать корректной отписке.
+            observableField.OnValueChanged += value => { TempManager.SetValue(requestName, value); };
+            TempManager.SetValue(requestName, observableField.GetValue());
+        }
+
+        _tempIsRegistry = true;
     }
     
     private void UnsubscribeFromRequests()
@@ -180,6 +201,13 @@ public abstract class Subscriber : MonoBehaviour
     }
 
     private string GetRequestName(RequestAttribute requestAttribute)
+    {
+        return requestAttribute.ObjectID
+            ? requestAttribute.GetEventNameByID(gameObject.GetInstanceID().ToString())
+            : requestAttribute.GetEventName();
+    }
+    
+    private string GetTempRequestName(TempRequestAttribute requestAttribute)
     {
         return requestAttribute.ObjectID
             ? requestAttribute.GetEventNameByID(gameObject.GetInstanceID().ToString())
