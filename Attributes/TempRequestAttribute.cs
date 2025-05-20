@@ -1,6 +1,6 @@
 ﻿using System;
 
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
 public class TempRequestAttribute : Attribute
 {
     public bool ObjectID { get; }

@@ -2,7 +2,7 @@
 
 namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleTriggerEvent
 {
-    public class EnemyAttack : Subscriber
+    public class EnemyAttack : MonoBehaviour
     {
         [SerializeField] private int damage;
 

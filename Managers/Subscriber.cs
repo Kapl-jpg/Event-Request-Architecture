@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-
 public abstract class Subscriber : MonoBehaviour
 {
     private bool _tempIsRegistry;
@@ -30,7 +29,7 @@ public abstract class Subscriber : MonoBehaviour
         var methods = GetType().GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
         foreach (var method in methods)
         {
-            foreach (var attribute in method.GetCustomAttributes(typeof(EventAttribute), false))
+            foreach (var attribute in method.GetCustomAttributes(typeof(EventAttribute), true))
             {
                 if (attribute is not EventAttribute eventAttribute) continue;
 
@@ -77,7 +76,7 @@ public abstract class Subscriber : MonoBehaviour
         var methods = GetType().GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
         foreach (var method in methods)
         {
-            foreach (var attribute in method.GetCustomAttributes(typeof(EventAttribute), false))
+            foreach (var attribute in method.GetCustomAttributes(typeof(EventAttribute), true))
             {
                 if (attribute is not EventAttribute eventAttribute) continue;
 
@@ -108,7 +107,7 @@ public abstract class Subscriber : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError($"No Unubscribe method found for type {paramType}");
+                        Debug.LogError($"No Unsubscribe method found for type {paramType}");
                     }
                 }
                 else
@@ -131,7 +130,6 @@ public abstract class Subscriber : MonoBehaviour
 
             if (fieldValue is not IObservableField observableField) continue;
 
-            // Замечание: лямбда здесь создаётся заново, что может помешать корректной отписке.
             observableField.OnValueChanged += value => { RequestManager.SetValue(requestName, value); };
             RequestManager.SetValue(requestName, observableField.GetValue());
         }
