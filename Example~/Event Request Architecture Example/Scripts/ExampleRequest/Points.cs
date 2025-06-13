@@ -1,18 +1,17 @@
-﻿using UnityEngine;
+﻿using ERA;
+using UnityEngine;
 
-namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleRequest
+public class Points : MonoBehaviour
 {
-    public class Points : MonoBehaviour
+    public void GetPoints()
     {
-        public void GetPoints()
-        {
-            var points = RequestManager.GetValue<int>("Points");
-            print($"Get points value: {points}");
-        }
+        RequestManager.TryGetValue("Points", out int points);
+        print($"Get points value: {points}");
+    }
 
-        public void ChangePoints()
-        {
-            EventManager.Publish("ChangePoints",50);
-        }
+    public void ChangePoints()
+    {
+        EventManager.Trigger("ChangePoints");
+        EventManager.Trigger("ChangePoints", 50);
     }
 }

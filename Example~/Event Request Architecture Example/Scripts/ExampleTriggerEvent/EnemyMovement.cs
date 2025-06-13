@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleTriggerEvent
-{
     public class EnemyMovement : MonoBehaviour
     {
         [SerializeField] private float speed;
@@ -33,6 +31,5 @@ namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleTriggerEvent
                     targetPosition = targetPosition == rightPosition ? leftPosition : rightPosition;
                 yield return null;
             }
-        }
     }
 }

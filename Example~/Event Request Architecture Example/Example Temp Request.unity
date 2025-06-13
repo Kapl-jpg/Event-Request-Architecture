@@ -525,7 +525,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   points:
-    value: 55
+    value: 2050
 --- !u!1 &1559910370
 GameObject:
   m_ObjectHideFlags: 0

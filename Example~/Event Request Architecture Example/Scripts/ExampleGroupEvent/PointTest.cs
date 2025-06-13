@@ -1,15 +1,18 @@
+using ERA;
 using UnityEngine;
 
-namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleGroupEvent
+public class PointTest : MonoBehaviour
 {
-    public class PointTest : Subscriber
-    {
-        [SerializeField] private string message;
+    [SerializeField] private string message;
 
-        [Event("PrintMessage")]
-        private void PrintMessage()
-        {
-            print(message);
-        }
+    private void Start()
+    {
+        EventManager.AddEvent("PrintMessage", gameObject, PrintMessage);
+    }
+
+    private void PrintMessage()
+    {
+        print(message);
     }
 }
+

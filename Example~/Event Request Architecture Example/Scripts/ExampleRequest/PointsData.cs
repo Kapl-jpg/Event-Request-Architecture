@@ -1,23 +1,26 @@
+using ERA;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleRequest
+public class PointsData : MonoBehaviour
 {
-    public class PointsData : Subscriber
+    private readonly ObservableField<int> _points = new();
+
+    private void Awake()
     {
-        [Request("Points")] 
-        private ObservableField<int> points = new();
+        EventManager.AddEvent<int>("ChangePoints",gameObject, ChangePoints);
+        EventManager.AddEvent("ChangePoints",gameObject, ChangePoints);
+        _points.Init("Points", gameObject);
+    }
 
-        [Event("ChangePoints")]
-        private void ChangePoints()
-        {
-            points.Value = Random.Range(0, 1001);
-            print($"New points.Value: {points.Value}");
-        }
-
-        [Event("ChangePoints")]
-        private void ChangePoints(int value)
-        {
-            print(value);
-        }
+    private void ChangePoints()
+    {
+        _points.Value = Random.Range(0, 1001);
+        print($"New points.Value: {_points.Value}");
+    }
+    
+    private void ChangePoints(int value)
+    {
+        print(value);
     }
 }
