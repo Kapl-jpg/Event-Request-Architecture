@@ -1,11 +1,10 @@
-﻿using ERA;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CallTempData: MonoBehaviour
 {
     public void PrintData()
     {
-        RequestManager.TryGetValue("Points", out int points);
+        var points = TempManager.GetValue<int>("Points");
         print(points);
     }
 }

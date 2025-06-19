@@ -1,26 +1,24 @@
-using ERA;
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour
+namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleTriggerEvent
 {
-    [SerializeField] private int maxHealth;
-
-    private int _currentHealth;
-
-    private void Awake()
+    public class PlayerHealth : Subscriber
     {
-        EventManager.AddEvent<int>($"{gameObject.GetInstanceID()}.ApplyDamage", gameObject, ApplyDamage);
-    }
+        [SerializeField] private int maxHealth;
 
-    private void Start()
-    {
-        _currentHealth = maxHealth;
-    }
+        private int _currentHealth;
 
-    private void ApplyDamage(int damage)
-    {
-        _currentHealth = Mathf.Clamp(_currentHealth - damage, 0, maxHealth);
+        private void Start()
+        {
+            _currentHealth = maxHealth;
+        }
 
-        print(_currentHealth);
+        [Event(true, "ApplyDamage")]
+        private void ApplyDamage(int damage)
+        {
+            _currentHealth = Mathf.Clamp(_currentHealth - damage, 0, maxHealth);
+            
+            print(_currentHealth);
+        }
     }
 }

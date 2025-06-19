@@ -1,14 +1,16 @@
-﻿using ERA;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class EnemyAttack : MonoBehaviour
+namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleTriggerEvent
 {
-    [SerializeField] private int damage;
-
-    private void OnTriggerEnter2D(Collider2D other)
+    public class EnemyAttack : MonoBehaviour
     {
-        if (!other.CompareTag("Player")) return;
+        [SerializeField] private int damage;
 
-        EventManager.Trigger($"{other.gameObject.GetInstanceID()}.ApplyDamage", damage);
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (!other.CompareTag("Player")) return;
+
+            EventManager.Publish($"{other.gameObject.GetInstanceID()}.ApplyDamage", damage);
+        }
     }
 }

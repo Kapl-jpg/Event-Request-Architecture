@@ -1,10 +1,12 @@
-using ERA;
 using UnityEngine;
 
-public class CallEvent : MonoBehaviour
+namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleGroupEvent
 {
-    public void Call()
+    public class CallEvent : MonoBehaviour
     {
-        EventManager.Trigger("PrintMessage");
+        public void Call()
+        {
+            EventManager.Publish("PrintMessage");
+        }
     }
 }

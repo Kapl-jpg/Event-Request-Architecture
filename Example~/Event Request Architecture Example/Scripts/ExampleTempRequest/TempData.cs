@@ -1,15 +1,9 @@
 using System.Collections;
-using ERA;
 using UnityEngine;
-
-public class TempData : MonoBehaviour
+public class TempData : Subscriber
 {
+    [TempRequest("Points")]
     [SerializeField] private ObservableField<int> points;
-
-    private void Awake()
-    {
-        points.InitTemp("Points");
-    }
 
     private IEnumerator Start()
     {
