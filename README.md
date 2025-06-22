@@ -27,7 +27,7 @@ Install via Unity Package Manager:
 2. Paste:
 
    ```
-   https://github.com/Kapl-jpg/Event-Request-Architecture.git
+   https://github.com/Kapl-jpg/Event-Request-Architecture.git#StableVersion
    ```
 3. Click **Add**.
 
