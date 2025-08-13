@@ -1,12 +1,16 @@
 using UnityEngine;
 
-namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleGroupEvent
+namespace Event_Request_Architecture.Example.Event_Request_Architecture_Example.Scripts.ExampleGroupEvent
 {
-    public class PointTest : Subscriber
+    public class PointTest : MonoBehaviour
     {
         [SerializeField] private string message;
 
-        [Event("PrintMessage")]
+        private void Awake()
+        {
+            EventManager.Subscribe("PrintMessage", gameObject, PrintMessage);
+        }
+
         private void PrintMessage()
         {
             print(message);

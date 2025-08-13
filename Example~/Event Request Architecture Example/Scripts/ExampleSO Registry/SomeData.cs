@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(menuName = "Data", fileName = "SomeData")]
-public class SomeData: ScriptableObject
+namespace Event_Request_Architecture.Example.Event_Request_Architecture_Example.Scripts.ExampleSO_Registry
 {
-    public int points = 100;
+    [CreateAssetMenu(menuName = "Data", fileName = "SomeData")]
+    public class SomeData: ScriptableObject
+    {
+        public int points = 100;
+    }
 }

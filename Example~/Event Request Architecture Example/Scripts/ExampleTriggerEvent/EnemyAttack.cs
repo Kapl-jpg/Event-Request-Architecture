@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleTriggerEvent
+namespace Event_Request_Architecture.Example.Event_Request_Architecture_Example.Scripts.ExampleTriggerEvent
 {
     public class EnemyAttack : MonoBehaviour
     {
@@ -10,7 +10,7 @@ namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleTriggerEvent
         {
             if (!other.CompareTag("Player")) return;
 
-            EventManager.Publish($"{other.gameObject.GetInstanceID()}.ApplyDamage", damage);
+            EventManager.Trigger($"{other.gameObject.GetInstanceID()}.ApplyDamage", damage);
         }
     }
 }

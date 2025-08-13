@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
 
-public class SOTest: MonoBehaviour
+namespace Event_Request_Architecture.Example.Event_Request_Architecture_Example.Scripts.ExampleSO_Registry
 {
-    private SomeData _obj;
-
-    private void Start()
+    public class SOTest: MonoBehaviour
     {
-        _obj = SOManager.Get<SomeData>("SomeData");
-        
-        if (_obj)
+        private SomeData _obj;
+
+        private void Start()
         {
-            print(_obj.points);
+            _obj = SOManager.Get<SomeData>("SomeData");
+        
+            if (_obj)
+            {
+                print(_obj.points);
+            }
         }
     }
 }

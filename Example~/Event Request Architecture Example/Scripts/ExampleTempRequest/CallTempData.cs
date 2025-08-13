@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 
-public class CallTempData: MonoBehaviour
+namespace Event_Request_Architecture.Example.Event_Request_Architecture_Example.Scripts.ExampleTempRequest
 {
-    public void PrintData()
+    public class CallTempData: MonoBehaviour
     {
-        var points = TempManager.GetValue<int>("Points");
-        print(points);
+        public void PrintData()
+        {
+            var points = RequestManager.GetValue<int>("Points");
+            print(points);
+        }
     }
 }
