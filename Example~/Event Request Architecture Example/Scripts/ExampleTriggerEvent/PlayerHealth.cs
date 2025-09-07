@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleTriggerEvent
+namespace Event_Request_Architecture.Example.Event_Request_Architecture_Example.Scripts.ExampleTriggerEvent
 {
-    public class PlayerHealth : Subscriber
+    public class PlayerHealth : MonoBehaviour
     {
         [SerializeField] private int maxHealth;
 
@@ -10,10 +10,10 @@ namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleTriggerEvent
 
         private void Start()
         {
+            EventManager.Subscribe<int>($"{gameObject.GetInstanceID()}.ApplyDamage",gameObject, ApplyDamage);
             _currentHealth = maxHealth;
         }
 
-        [Event(true, "ApplyDamage")]
         private void ApplyDamage(int damage)
         {
             _currentHealth = Mathf.Clamp(_currentHealth - damage, 0, maxHealth);

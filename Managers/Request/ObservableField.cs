@@ -22,8 +22,9 @@ public class ObservableField<T> : IObservableField
         }
     }
 
-    public ObservableField(T initialValue = default)
+    public ObservableField(Action<T> onTypedValueChanged, T initialValue = default)
     {
+        OnTypedValueChanged = onTypedValueChanged;
         value = initialValue;
     }
 

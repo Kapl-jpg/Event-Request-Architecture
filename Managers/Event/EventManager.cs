@@ -4,101 +4,101 @@ using UnityEngine;
 
 public static class EventManager
 {
-    private static readonly Dictionary<string, Delegate> EventHandlers = new();
+    private class Subscription
+    {
+        public GameObject Owner;
+        public Delegate Handler;
+    }
+
+    private static readonly Dictionary<string, List<Subscription>> _nonParamEvents = new();
+    private static readonly Dictionary<string, List<Subscription>> _paramEvents = new();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Initialize()
     {
-        Application.quitting += OnApplicationQuit;
-    }
-
-    private static void OnApplicationQuit()
-    {
-        EventHandlers.Clear();
-    }
-
-    #region Subscribe with parameters
-
-    public static void Subscribe<T>(string eventName, Action<T> handler)
-    {
-        if (EventHandlers.TryGetValue(eventName, out var existing))
+        Application.quitting += () =>
         {
-            EventHandlers[eventName] = Delegate.Combine(existing, handler);
+            _nonParamEvents.Clear();
+            _paramEvents.Clear();
+        };
+    }
+
+    #region Subscribe без параметров
+
+    public static void Subscribe(string eventName, GameObject owner, Action handler)
+    {
+        if (!_nonParamEvents.TryGetValue(eventName, out var list))
+        {
+            list = new List<Subscription>();
+            _nonParamEvents[eventName] = list;
         }
-        else
-        {
-            EventHandlers.Add(eventName, handler);
-        }
+        list.Add(new Subscription { Owner = owner, Handler = handler });
     }
 
-    public static void Unsubscribe<T>(string eventName, Action<T> handler)
+    public static void Trigger(string eventName)
     {
-        if (EventHandlers.TryGetValue(eventName, out var existing))
-        {
-            var currentDel = Delegate.Remove(existing, handler);
-            if (currentDel == null)
-                EventHandlers.Remove(eventName);
-            else
-                EventHandlers[eventName] = currentDel;
-        }
-    }
+        if (!_nonParamEvents.TryGetValue(eventName, out var list))
+            return;
 
-    public static void Publish<T>(string eventName, T eventArgs)
-    {
-        if (EventHandlers.TryGetValue(eventName, out var del))
+        for (int i = list.Count - 1; i >= 0; i--)
         {
-            if (del is Action<T> callback)
+            var sub = list[i];
+            if (sub.Owner == null)
             {
-                callback.Invoke(eventArgs);
+                list.RemoveAt(i);
+                continue;
             }
+            if (!sub.Owner.activeInHierarchy)
+                continue;
+
+            if (sub.Handler is Action callback)
+                callback.Invoke();
             else
-            {
-                Debug.LogError($"Событие '{eventName}' существует, но тип делегата не соответствует Action<{typeof(T).Name}>");
-            }
+                Debug.LogError($"Event '{eventName}' exists, but delegate type is not Action");
         }
+
+        if (list.Count == 0)
+            _nonParamEvents.Remove(eventName);
     }
 
     #endregion
 
-    #region Subscribe without parameters
+    #region Subscribe с параметрами
 
-    public static void Subscribe(string eventName, Action handler)
+    public static void Subscribe<T>(string eventName, GameObject owner, Action<T> handler)
     {
-        if (EventHandlers.TryGetValue(eventName, out var existing))
+        if (!_paramEvents.TryGetValue(eventName, out var list))
         {
-            EventHandlers[eventName] = Delegate.Combine(existing, handler);
+            list = new List<Subscription>();
+            _paramEvents[eventName] = list;
         }
-        else
-        {
-            EventHandlers.Add(eventName, handler);
-        }
+        list.Add(new Subscription { Owner = owner, Handler = handler });
     }
 
-    public static void Unsubscribe(string eventName, Action handler)
+    public static void Trigger<T>(string eventName, T eventArgs)
     {
-        if (EventHandlers.TryGetValue(eventName, out var existing))
-        {
-            var currentDel = Delegate.Remove(existing, handler);
-            if (currentDel == null)
-                EventHandlers.Remove(eventName);
-            else
-                EventHandlers[eventName] = currentDel;
-        }
-    }
+        if (!_paramEvents.TryGetValue(eventName, out var list))
+            return;
 
-    public static void Publish(string eventName)
-    {
-        if (EventHandlers.TryGetValue(eventName, out var del))
+        for (int i = list.Count - 1; i >= 0; i--)
         {
-            if (del is Action callback)
+            var sub = list[i];
+            if (sub.Owner == null)
             {
-                callback.Invoke();
+                list.RemoveAt(i);
+                continue;
             }
+            if (!sub.Owner.activeInHierarchy)
+                continue;
+
+            if (sub.Handler is Action<T> callback)
+                callback.Invoke(eventArgs);
             else
-            {
-                Debug.LogError($"Событие '{eventName}' существует, но тип делегата не соответствует Action");
-            }
+                Debug.LogError($"Event '{eventName}' exists, but delegate type is not Action<{typeof(T).Name}>");
         }
+
+        if (list.Count == 0)
+            _paramEvents.Remove(eventName);
     }
 
     #endregion

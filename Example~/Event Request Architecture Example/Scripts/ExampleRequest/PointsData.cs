@@ -1,20 +1,23 @@
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-namespace Example.Event_Driven_Architecture_Example.Scripts.ExampleRequest
+namespace Event_Request_Architecture.Example.Event_Request_Architecture_Example.Scripts.ExampleRequest
 {
-    public class PointsData : Subscriber
+    public class PointsData : MonoBehaviour
     {
-        [Request("Points")] 
-        private ObservableField<int> points = new();
-
-        [Event("ChangePoints")]
-        private void ChangePoints()
+        private void Awake()
         {
-            points.Value = Random.Range(0, 1001);
-            print($"New points.Value: {points.Value}");
+            EventManager.Subscribe("ChangePoints", gameObject, ChangePoints);
+            EventManager.Subscribe<int>("ChangePoints", gameObject, ChangePoints);
         }
 
-        [Event("ChangePoints")]
+        private void ChangePoints()
+        {
+            var random = Random.Range(0, 1001);
+            RequestManager.SetValue("Points", random);
+            print($"New points.Value: {random}");
+        }
+
         private void ChangePoints(int value)
         {
             print(value);
